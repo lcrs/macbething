@@ -1,0 +1,120 @@
+#! /usr/local/Nuke10.5v1/libnuke-10.5.1.so -nx
+#write_info Write1 file:"/usr/discreet.nvme/flame_2018.1/Desktop/macbething/t.exr" format:"1920 1080 1" chans:":rgba.red:rgba.green:rgba.blue:" framerange:"794163 795306" fps:"24" colorspace:"default" datatype:"16 bit half" transfer:"unknown" views:"main" timecode:"01:00:42:05" colorManagement:"Nuke"
+version 10.5 v1
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="0" w="1920" h="1080" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1257" stretch="1"/>
+            <splitter orientation="2">
+                <split size="607"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+                <split size="426"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /usr/discreet.nvme/flame_2018.1/Desktop/macbething/unpin.nk
+ frame 794163
+ first_frame 794163
+ last_frame 795306
+ lock_range true
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+Read {
+ inputs 0
+ file /usr/discreet.nvme/flame_2018.1/Desktop/macbething/u.exr
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ origset true
+ version 80
+ name Read2
+ xpos -706
+ ypos 276
+}
+set N4df1250 [stack 0]
+Read {
+ inputs 0
+ file /usr/discreet.nvme/flame_2018.1/Desktop/macbething/charts/Alexa87413.dpx
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ origset true
+ colorspace AlexaV3LogC
+ raw true
+ name Read1
+ xpos -591
+ ypos 63
+}
+CornerPin2D {
+ to1 {0 0}
+ to2 {1920 0}
+ to3 {1920 1080}
+ to4 {0 1080}
+ invert false
+ from1 {174.8999939 279}
+ from2 {642.2000122 235.5}
+ from3 {679.7999878 550.9000244}
+ from4 {214.3000031 601.1500244}
+ name CornerPin2D1
+ xpos -591
+ ypos 176
+}
+Reformat {
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ name Reformat1
+ xpos -591
+ ypos 202
+}
+Write {
+ file /usr/discreet.nvme/flame_2018.1/Desktop/macbething/t.exr
+ file_type exr
+ version 1
+ name Write1
+ xpos -591
+ ypos 262
+}
+set N4e42850 [stack 0]
+Merge2 {
+ inputs 2
+ operation plus
+ mix 0.115
+ name Merge1
+ xpos -595
+ ypos 326
+}
+push $N4e42850
+push $N4df1250
+Viewer {
+ inputs 2
+ frame_range 794163-794163
+ frame_range_lock true
+ viewerProcess None
+ name Viewer1
+ xpos -491
+ ypos 449
+}
