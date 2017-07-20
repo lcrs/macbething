@@ -66,7 +66,12 @@ def makechart(sr, sg, sb, ids):
 	return r, g, b
 
 frontr, frontg, frontb = exr2arrays('front.exr')
+targetr, targetg, targetb = exr2arrays('target.exr')
 ids = patchids(frontr.shape[1], frontr.shape[0], 0.4, 4, 6, 0.025, 0.095)
-sr, sg, sb = samplechart(frontr, frontg, frontb, ids)
-resultr, resultg, resultb = makechart(sr, sg, sb, ids)
-arrays2exr(resultr, resultg, resultb, 'result.exr')
+fr, fg, fb = samplechart(frontr, frontg, frontb, ids)
+tr, tg, tb = samplechart(targetr, targetg, targetb, ids)
+fp = zip(fr, fg, fb)
+tp = zip(tr, tg, tb)
+mat = numpy.linalg.lstsq(fp, tp)[0].transpose()
+nukecolormatrix = 'ColorMatrix {\n matrix { {%f %f %f} {%f %f %f} {%f %f %f} }\n}' % tuple(mat.ravel())
+print nukecolormatrix
