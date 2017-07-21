@@ -1,7 +1,7 @@
 # To get the modules we need on CentOS 7:
 # sudo yum install numpy openexr openexr-devel gcc-c++
 # sudo easy_install -Z openexr (egg files end up in /usr/lib/python2.7/site-packages)
-import OpenEXR, Imath, numpy
+import OpenEXR, Imath, numpy, uuid
 
 # Returns three numpy arrays from an EXR's RGB planes
 def exr2arrays(exrpath):
@@ -72,6 +72,9 @@ fr, fg, fb = samplechart(frontr, frontg, frontb, ids)
 tr, tg, tb = samplechart(targetr, targetg, targetb, ids)
 fp = zip(fr, fg, fb)
 tp = zip(tr, tg, tb)
+
+# Sanitize patch samples - remove id 0 which is chart background and clipped colours
+
 mat = numpy.linalg.lstsq(fp, tp)[0].transpose()
-nukecolormatrix = 'ColorMatrix {\n matrix { {%f %f %f} {%f %f %f} {%f %f %f} }\n}' % tuple(mat.ravel())
-print nukecolormatrix
+nukecolormatrix = 'ColorMatrix {\n matrix { {%f %f %f} {%f %f %f} {%f %f %f} }\n label "Created from\\ncolour chart\\nby Ls_LUTy"\n}\n' % tuple(mat.ravel())
+ctf = '<?xml version="1.0" encoding="UTF-8"?>\n<ProcessList id="%s" version="1.2">\n    <Description>Matrix created from colour chart by Ls_LUTy</Description>\n    <Matrix inBitDepth="16f" outBitDepth="16f">\n        <Array dim="3 3 3">\n %f %f %f\n %f %f %f\n %f %f %f\n        </Array>\n    </Matrix>\n</ProcessList>\n' % ((str(uuid.uuid4()),) + tuple(mat.ravel()))
