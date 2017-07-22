@@ -70,11 +70,21 @@ targetr, targetg, targetb = exr2arrays('target.exr')
 ids = patchids(frontr.shape[1], frontr.shape[0], 0.4, 4, 6, 0.025, 0.095)
 fr, fg, fb = samplechart(frontr, frontg, frontb, ids)
 tr, tg, tb = samplechart(targetr, targetg, targetb, ids)
-fp = zip(fr, fg, fb)
-tp = zip(tr, tg, tb)
+frontsamples = zip(fr, fg, fb)
+targetsamples = zip(tr, tg, tb)
 
-# Sanitize patch samples - remove id 0 which is chart background and clipped colours
+frontvalidpatches = []
+targetvalidpatches = []
+rejects = 0
+for i in range(1, len(frontsamples)):
+	if(i == 0):
+		continue # ID 0 is all pixels not in a patch
+	if(min(frontsamples[i] + targetsamples[i]) <= 0.0):
+		rejects = rejects + 1
+		continue # This patch is clipped
+	frontvalidpatches.append(frontsamples[i])
+	targetvalidpatches.append(targetsamples[i])
 
-mat = numpy.linalg.lstsq(fp, tp)[0].transpose()
+mat = numpy.linalg.lstsq(frontvalidpatches, targetvalidpatches)[0].transpose()
 nukecolormatrix = 'ColorMatrix {\n matrix { {%f %f %f} {%f %f %f} {%f %f %f} }\n label "Created from\\ncolour chart\\nby Ls_LUTy"\n}\n' % tuple(mat.ravel())
 ctf = '<?xml version="1.0" encoding="UTF-8"?>\n<ProcessList id="%s" version="1.2">\n    <Description>Matrix created from colour chart by Ls_LUTy</Description>\n    <Matrix inBitDepth="16f" outBitDepth="16f">\n        <Array dim="3 3 3">\n %f %f %f\n %f %f %f\n %f %f %f\n        </Array>\n    </Matrix>\n</ProcessList>\n' % ((str(uuid.uuid4()),) + tuple(mat.ravel()))
